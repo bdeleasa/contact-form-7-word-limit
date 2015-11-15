@@ -10,7 +10,7 @@ License: GPL v3
 
 
 // Include our classes
-require_once 'classes/class-wpcfy-word-limit.php';
+require_once 'classes/class-wpcf7-word-limit.php';
 
 
 add_action( 'plugins_loaded', 'wpcf7wl_init' );
