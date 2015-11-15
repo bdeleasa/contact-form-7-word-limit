@@ -79,15 +79,16 @@ class WPCF7_Word_Limit {
     function textarea_validation_filter( $result, $tag ) {
 
         $tag = new WPCF7_Shortcode( $tag );
-
         $name = $tag->name;
-
         $value = isset( $_POST[$name] ) ? (string) $_POST[$name] : '';
 
+        // If this is a required field, make sure we
+        // have a value.  If not, throw an error
         if ( $tag->is_required() && empty($value) ) {
             $result->invalidate( $tag, wpcf7_get_message( 'invalid_required' ) );
         }
 
+        // If we have a value, let's start the validation
         if ( ! empty( $value ) ) {
             $maxlengthwords = false;
             $minlengthwords = false;
@@ -98,10 +99,14 @@ class WPCF7_Word_Limit {
 
             $characterlength = strlen( $value );
 
+            // If someone mistakenly set the minlength greater than the
+            // maxlength, set both variables to null.
             if ( $maxlength && $minlength && $maxlength < $minlength ) {
                 $maxlength = $minlength = null;
             }
 
+            // Loop through each of the options/attributes in this tag
+            // and check for our maxlengthwords and minlengthwords option/attribute
             foreach($tag->options as $key => $option ) {
                 if ( stristr($option, 'maxlengthwords:true') ) {
                     $maxlengthwords = true;
@@ -112,26 +117,32 @@ class WPCF7_Word_Limit {
                 }
             }
 
+            // If this field needs to be validated for a maximum word length, check the
+            // length of the input and if the length is greater than the maximum
+            // length, throw an error.
             if ( $maxlengthwords === true ) {
                 if ( $inputlength > intval($maxlength) ) {
                     $result->invalidate( $tag, "Your input is too long (<strong>{$inputlength}</strong>/{$maxlength} maximum words)" );
                 }
             }
-            else {
-                if ( $maxlength && $maxlength < $characterlength ) {
-                    $result->invalidate( $tag, wpcf7_get_message( 'invalid_too_long' ) );
-                }
+            // If there's no maximum word length but a maximum length is set,
+            // validate the character length
+            else if ( $maxlength && $maxlength < $characterlength ) {
+                $result->invalidate( $tag, wpcf7_get_message( 'invalid_too_long' ) );
             }
 
+            // If this field needs to be validated for a minimum word length, check the
+            // length of the input and if the length is less than the minimum length,
+            // throw an error
             if ( $minlengthwords === true ) {
                 if ( intval($inputlength) < intval($minlength) ) {
                     $result->invalidate( $tag, "Your input is too short (<strong>{$inputlength}</strong>/{$minlength} minimum words)" );
                 }
             }
-            else {
-                if ( $minlength && $characterlength < $minlength ) {
-                    $result->invalidate( $tag, wpcf7_get_message( 'invalid_too_short' ) );
-                }
+            // If there's no minimum word length but a minimum length is set,
+            // validate the character length
+            else if ( $minlength && $characterlength < $minlength ) {
+                $result->invalidate( $tag, wpcf7_get_message( 'invalid_too_short' ) );
             }
         }
 
