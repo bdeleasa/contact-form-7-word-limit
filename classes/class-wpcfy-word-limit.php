@@ -84,7 +84,7 @@ class WPCF7_Word_Limit {
 
         $value = isset( $_POST[$name] ) ? (string) $_POST[$name] : '';
 
-        if ( $tag->is_required() && '' == $value ) {
+        if ( $tag->is_required() && empty($value) ) {
             $result->invalidate( $tag, wpcf7_get_message( 'invalid_required' ) );
         }
 
