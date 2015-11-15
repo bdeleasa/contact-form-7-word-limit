@@ -198,16 +198,25 @@ class WPCF7_Word_Limit {
         if ( $atts['maxlength'] && $atts['minlength'] && $atts['maxlength'] < $atts['minlength'] ) {
             unset( $atts['maxlength'], $atts['minlength'] );
         }
-        
-        $maxlengthwords = false;
 
+        $maxlengthwords = false;
+        $minlengthwords = false;
+
+        // Check whether the field has a min or max word length
         foreach($tag->options as $key => $option ) {
             if ( stristr($option, 'maxlengthwords:true') ) {
                 $maxlengthwords = true;
             }
+
+            if ( stristr($option, 'minlengthwords:true') ) {
+                $minlengthwords = true;
+            }
         }
 
-        if ( $maxlengthwords === true ) {
+        // If this field has either the min or max word length validation,
+        // remove the maxlength and minlength variables because we aren't
+        // validating for character length
+        if ( $maxlengthwords === true || $minlengthwords === true ) {
             unset( $atts['maxlength'], $atts['minlength'] );
         }
 
